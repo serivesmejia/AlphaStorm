@@ -1,5 +1,6 @@
 <script lang="ts">
-    import G4 from "../popups/G4.svelte";
+    import KPredictionPlot from "$lib/plot/helios/KPredictionPlot.svelte";
+    import G4 from "./popups/G4.svelte";
 
     var G1Visible = true
 
@@ -102,10 +103,10 @@
 </header>
  
 <body>
-    
-
     <menu class="cuerpo">
-        <div class="primer"></div>
+        <div class="primer">
+            <KPredictionPlot/>
+        </div>
         <div class="texto"></div>
     </menu>
 </body>
