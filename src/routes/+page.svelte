@@ -4,7 +4,24 @@
     import { model } from "$lib/alphapredict/model"
     import KPlot from "$lib/plot/helios/KPlot.svelte";
 
-    console.log(model.predict(tf.tensor2d([20], [1, 1])).dataSync());
+    var G1Visible = true
+    var G1Visible = true
+    var G2Visible = true
+    var G3Visible = true
+    var G4Visible = true
+    var G5Visible = true
+
+    function pepe() {
+        G1Visible = false
+    
+    }
+    
+    function Leo() {
+        G1Visible = false
+        G2Visible = false
+        G3Visible = false
+        G4Visible = false
+        G5Visible = false
+    }
 </script>
 
-<KPlot sampleSize=10/>
