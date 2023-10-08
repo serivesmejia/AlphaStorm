@@ -1,7 +1,6 @@
 <script>
-  import * as d3 from 'd3';
+  	import * as d3 from 'd3';
 
-  	export let data;
   	export let width = 640;
 	export let height = 400;
 	export let marginTop = 20;
@@ -12,8 +11,9 @@
   	let gx;
 	let gy;
 
-  	$: x = d3.scaleLinear([0, data.length - 1], [marginLeft, width - marginRight]);
-  	$: y = d3.scaleLinear(d3.extent(data), [height - marginBottom, marginTop]);
+  	export let x = d3.scaleLinear();
+  	export let y = d3.scaleLinear();
+
 	$: line = d3.line((d, i) => x(i), y);
 	$: d3.select(gy).call(d3.axisLeft(y));
 	$: d3.select(gx).call(d3.axisBottom(x));
