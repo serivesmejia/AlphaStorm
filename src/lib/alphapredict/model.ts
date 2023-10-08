@@ -1,16 +1,41 @@
 import * as tf from "@tensorflow/tfjs"
-import { fetchPotsdamHistoricKP } from "$lib/api/potsdam/historic_kp"
-
-fetchPotsdamHistoricKP((data) => {
-    console.log(data[0])
-})
+import { fetchPotsdamHistoricKP, type PotsdamKpData } from "$lib/api/potsdam/historic_kp"
 
 export const model: tf.Sequential = tf.sequential()
 model.add(tf.layers.dense({units: 1, inputShape: [1]}))
 
 model.compile({loss: 'meanSquaredError', optimizer: "sgd"})
 
-const xs = tf.tensor2d([-1, 0, 1, 2, 3, 4], [6, 1])
-const ys = tf.tensor2d([-3, -1, 1, 3, 5, 7], [6, 1])
+fetchPotsdamHistoricKP((data: PotsdamKpData[]) => {
+    const xs = tf.tensor2d(data.map((potsdam) => potsdam.date), [data.length, 1])
+    const ys = tf.tensor2d(data.map((potsdam) => potsdam.Kp), [data.length, 1])
+    
+    console.log("begin model trainin")
 
-await model.fit(xs, ys, {epochs: 250})
+    model.fit(xs, ys, {
+        epochs: 250,
+        callbacks: {
+            onTrainBegin: async () => {
+              console.log("onTrainBegin")
+            },
+            onTrainEnd: async (epoch, logs) => {
+              console.log("onTrainEnd" + epoch + JSON.stringify(logs))
+            },
+            onEpochBegin: async (epoch, logs) => {
+              console.log("onEpochBegin" + epoch + JSON.stringify(logs))
+            },
+            onEpochEnd: async (epoch, logs) => {
+              console.log("onEpochEnd" + epoch + JSON.stringify(logs))
+            },
+            onBatchBegin: async (epoch, logs) => {
+              console.log("onBatchBegin" + epoch + JSON.stringify(logs))
+            },
+            onBatchEnd: async (epoch, logs) => {
+              console.log("onBatchEnd" + epoch + JSON.stringify(logs))
+            }
+          }
+    }).then((_out) => {
+        model.save('downloads://alpha-predict')
+        model.predict(tf.tensor2d([20], [1, 1])).dataSync()
+    })
+})
