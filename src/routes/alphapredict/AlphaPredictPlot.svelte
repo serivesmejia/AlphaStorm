@@ -5,7 +5,7 @@
     import { parseToAlphaTimestamp, alphaTimestampToPDate, pDateHourStep, dateToAlphaTimestamp } from "$lib/api/potsdam/historic_kp";
     import LinePlot from "$lib/plot/LinePlot.svelte";
 
-    const date = new Date(1900, 10 - 1, 8, 10)
+    const date = new Date(Date.now())
     const testPDate = alphaTimestampToPDate(dateToAlphaTimestamp(date))
 
     export const hourStep = 1000
@@ -28,8 +28,8 @@
 
         data = {
             labels: dataHourly.map((_value, index) => { 
-                date.setUTCHours(date.getUTCHours() + (index * hourStep))
-                return date.toDateString()
+                date.setUTCHours(date.getUTCHours() + (index / 2))
+                return date.toUTCString()
              }),
  
             datasets: [{

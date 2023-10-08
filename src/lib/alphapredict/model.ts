@@ -13,8 +13,9 @@ export class AlphaPredictModelTrainer {
         this.epoch = epoch
         this.batchSize = batchSize
 
-        this.model.add(tf.layers.dense({units: 128, inputShape: [1], activation: 'relu'}))
-        this.model.add(tf.layers.dense({units: 32, activation: 'relu'}))
+        this.model.add(tf.layers.dense({units: 256, inputShape: [1], activation: 'relu'}))
+        this.model.add(tf.layers.dense({units: 128, activation: 'relu'}))
+        this.model.add(tf.layers.dense({units: 64, activation: 'relu'}))
         this.model.add(tf.layers.dense({units: 1, activation: 'linear' }))
 
         this.model.compile({loss: 'meanSquaredError', optimizer: "adam"})
@@ -36,13 +37,13 @@ export class AlphaPredictModelTrainer {
     
             console.log(xs.arraySync())
 
-            const ysnorm = ys.sub(min).div(max.sub(min))
+            const xsnorm = xs.sub(min).div(max.sub(min))
 
-            console.log(ysnorm.arraySync())
+            console.log(xsnorm.arraySync())
 
             console.log("begin model training")
 
-            this.model.fit(xs, ysnorm, {
+            this.model.fit(xsnorm, ys, {
                 epochs: this.epoch,
                 batchSize: this.batchSize,
                 callbacks: {
