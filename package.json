@@ -1,9 +1,8 @@
 {
-	"name": "alphastorm",
+	"name": "typescript",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"host": "vite dev --host",
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
@@ -21,7 +20,11 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@tensorflow/tfjs": "^4.11.0",
 		"@types/d3": "^7.4.1",
-		"d3": "^7.8.5"
+		"chart.js": "^4.4.0",
+		"d3": "^7.8.5",
+		"synaptic": "^1.1.4",
+		"tensorflow.js": "^0.0.1"
 	}
 }

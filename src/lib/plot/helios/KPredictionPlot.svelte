@@ -1,24 +1,37 @@
 <script lang="ts">
-    import { fetchKpPredictionHourlyHistory, type KpPrediction, type KpPredictionHistory } from '$lib/api/noaa/kp';
-    import LineXYPlot from '$lib/plot/LineXYPlot.svelte';
-    import * as d3 from 'd3';
-  
-    export var sampleSize = 60;
+    import { getHourFromUTCDate, utcHourMinus } from '$lib/api/noaa/date';
+    import { fetchKpPredictionHourlyHistory, type KpPrediction, type KpPredictionHistory } from '$lib/api/noaa/kp_prediction';
 
-    var x = d3.scaleOrdinal([0, sampleSize])
-    var y = d3.scaleLinear([0, 9])
-  
-    fetchKpPredictionHourlyHistory((kpData: KpPredictionHistory) => {
-        x.domain(kpData.predictions.map((d: KpPrediction) => d.model_prediction_time))
+    import LinePlot from '$lib/plot/LinePlot.svelte';
+    import type { ChartData } from 'chart.js/auto';
 
+    export let sampleSize = 10
+
+    var data: ChartData
+    var resolved = false
+
+    fetchKpPredictionHourlyHistory((kpData: KpPrediction[]) => {
         var sample = []
 
         for(let i = 0 ; i < sampleSize ; i++) {
-            sample.push(kpData.predictions[i])
+            sample.push(kpData[i])
         }
 
-        y.domain(sample)
+        data = {
+            labels: sample.map((x) => getHourFromUTCDate(x.model_prediction_time)),
+            datasets: [{
+                label: "K Index",
+                data: sample.map((x) => x.k),
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        }
+
+        resolved = true
     })
 </script>
 
-<LineXYPlot x={x} y={y}/>
+{#if resolved}
+    <LinePlot data={data}/>
+{/if}
