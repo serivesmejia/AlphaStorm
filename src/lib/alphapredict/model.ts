@@ -1,16 +1,78 @@
 import * as tf from "@tensorflow/tfjs"
-import { fetchPotsdamHistoricKP } from "$lib/api/potsdam/historic_kp"
+import { fetchPotsdamHistoricKP, type PotsdamKpData } from "$lib/api/potsdam/historic_kp"
 
-fetchPotsdamHistoricKP((data) => {
-    console.log(data[0])
-})
+export class AlphaPredictModelTrainer {
+    model: tf.Sequential
 
-export const model: tf.Sequential = tf.sequential()
-model.add(tf.layers.dense({units: 1, inputShape: [1]}))
+    epoch: number
+    batchSize: number
 
-model.compile({loss: 'meanSquaredError', optimizer: "sgd"})
+    constructor(epoch: number, batchSize: number) { 
+        this.model = tf.sequential()
 
-const xs = tf.tensor2d([-1, 0, 1, 2, 3, 4], [6, 1])
-const ys = tf.tensor2d([-3, -1, 1, 3, 5, 7], [6, 1])
+        this.epoch = epoch
+        this.batchSize = batchSize
 
-await model.fit(xs, ys, {epochs: 250})
+        this.model.add(tf.layers.dense({units: 128, inputShape: [1], activation: 'relu'}))
+        this.model.add(tf.layers.dense({units: 32, activation: 'relu'}))
+        this.model.add(tf.layers.dense({units: 1, activation: 'linear' }))
+
+        this.model.compile({loss: 'meanSquaredError', optimizer: "adam"})
+    }
+
+    train(callback: (m: tf.Sequential) => void) {
+        fetchPotsdamHistoricKP((data: PotsdamKpData[]) => {
+            let min = tf.scalar(data[0].date)
+            let max = tf.scalar(data[data.length - 1].date)
+
+            const xs = tf.tensor2d((function() {
+                const shuffled = data.map((potsdam) => potsdam.date)
+                tf.util.shuffle(shuffled)
+ 
+                return shuffled
+            })(), [data.length, 1])
+
+            const ys = tf.tensor2d(data.map((potsdam) => potsdam.Kp), [data.length, 1])
+    
+            console.log(xs.arraySync())
+
+            const ysnorm = ys.sub(min).div(max.sub(min))
+
+            console.log(ysnorm.arraySync())
+
+            console.log("begin model training")
+
+            this.model.fit(xs, ysnorm, {
+                epochs: this.epoch,
+                batchSize: this.batchSize,
+                callbacks: {
+                    onTrainBegin: async () => {
+                      console.log("onTrainBegin")
+                    },
+                    onTrainEnd: async (epoch, logs) => {
+                      console.log("onTrainEnd" + epoch + JSON.stringify(logs))
+                    },
+                    onEpochBegin: async (epoch, logs) => {
+                      console.log("onEpochBegin" + epoch + JSON.stringify(logs))
+                    },
+                    onEpochEnd: async (epoch, logs) => {
+                      console.log("onEpochEnd" + epoch + JSON.stringify(logs))
+                    },
+                    onBatchBegin: async (epoch, logs) => {
+                      console.log("onBatchBegin" + epoch + JSON.stringify(logs))
+                    },
+                    onBatchEnd: async (epoch, logs) => {
+                      console.log("onBatchEnd" + epoch + JSON.stringify(logs))
+                    }
+                }
+            }).then((_out) => {
+                callback(this.model)
+            })
+        })
+    }
+
+}
+
+export function fetchAlphaPredictModel(callback: (m: tf.LayersModel) => void) {
+    tf.loadLayersModel("/model/alpha-predict.json").then(callback)
+}
