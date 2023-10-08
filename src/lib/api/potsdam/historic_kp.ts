@@ -23,8 +23,23 @@ export function parseToAlphaTimestamp(year: number, month: number, day: number, 
     return 8760 * yearsSince1932 + days * 24 + hour
 }
 
+export function dateToAlphaTimestamp(date: Date): number {
+    return parseToAlphaTimestamp(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDay(), date.getUTCHours())
+}
+
+const min =  parseToAlphaTimestamp(1932, 1, 1, 0) + Number.EPSILON
+const max =  parseToAlphaTimestamp(2023, 10, 7, 21)
+
+export const pDateHourStep = (1 / (max - min))
+
+export function alphaTimestampToPDate(alphaTimestamp: number): number {
+    // console.log({hourStep: pDateHourStep})
+    // const xsnorm = xs.sub(min).div(max.sub(min)))
+    return (alphaTimestamp - min) / (max - min)
+}
+
 export function fetchPotsdamHistoricKP(callback: (data: PotsdamKpData[]) => void) {
-    fetch("Kp_ap_since_1932.txt").then((out) => out.text())
+    fetch("/Kp_ap_since_1932.txt").then((out) => out.text())
         .then((text) => {
             console.log(text)
             let data: PotsdamKpData[] = []
@@ -32,10 +47,8 @@ export function fetchPotsdamHistoricKP(callback: (data: PotsdamKpData[]) => void
             for(var i = 0 ; i < text.length ; i += 58) {
                 let line = text.substring(i, i + 58)
 
-                if(i == 0) {
-                    console.log(line)
-                }
-
+                if(line.startsWith("#")) continue;
+                
                 let entries = line.split(" ")
                 let year = entries[0]
                 let month = entries[1]
