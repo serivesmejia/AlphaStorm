@@ -2,18 +2,33 @@ import * as tf from "@tensorflow/tfjs"
 import { fetchPotsdamHistoricKP, type PotsdamKpData } from "$lib/api/potsdam/historic_kp"
 
 export const model: tf.Sequential = tf.sequential()
-model.add(tf.layers.dense({units: 1, inputShape: [1]}))
+model.add(tf.layers.dense({units: 64, inputShape: [1], activation: 'relu'}))
+model.add(tf.layers.dense({units: 1, activation: 'linear' }))
 
-model.compile({loss: 'meanSquaredError', optimizer: "sgd"})
+model.compile({loss: 'meanSquaredError', optimizer: "adam"})
 
 fetchPotsdamHistoricKP((data: PotsdamKpData[]) => {
-    const xs = tf.tensor2d(data.map((potsdam) => potsdam.date), [data.length, 1])
+    let min = tf.scalar(data[0].date)
+    let max = tf.scalar(data[data.length - 1].date)
+
+    const xs = tf.tensor2d(data.map((potsdam) => {
+      let date = potsdam.date + Number.EPSILON
+      console.log(date)
+      return date
+    }), [data.length, 1])
     const ys = tf.tensor2d(data.map((potsdam) => potsdam.Kp), [data.length, 1])
     
+    console.log(xs.arraySync()[10])
+
+    const xsnorm = xs.sub(min).div(max.sub(min))
+
+    console.log(xsnorm.arraySync()[10])
+
     console.log("begin model trainin")
 
-    model.fit(xs, ys, {
-        epochs: 250,
+    model.fit(xsnorm, ys, {
+        epochs: 100,
+        batchSize: 32,
         callbacks: {
             onTrainBegin: async () => {
               console.log("onTrainBegin")
