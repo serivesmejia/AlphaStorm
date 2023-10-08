@@ -13,11 +13,11 @@ export class AlphaPredictModelTrainer {
         this.epoch = epoch
         this.batchSize = batchSize
 
-        this.model.add(tf.layers.dense({units: 128, inputShape: [2], activation: 'relu'}))
-        this.model.add(tf.layers.dense({units: 64, activation: 'relu'}))
+        this.model.add(tf.layers.dense({units: 128, inputShape: [1], activation: 'relu'}))
+        this.model.add(tf.layers.dense({units: 32, activation: 'relu'}))
         this.model.add(tf.layers.dense({units: 1, activation: 'linear' }))
 
-        this.model.compile({loss: 'meanAbsoluteError', optimizer: "adam"})
+        this.model.compile({loss: 'meanSquaredError', optimizer: "adam"})
     }
 
     train(callback: (m: tf.Sequential) => void) {
@@ -25,18 +25,24 @@ export class AlphaPredictModelTrainer {
             let min = tf.scalar(data[0].date)
             let max = tf.scalar(data[data.length - 1].date)
 
-            const xs = tf.tensor2d(data.map((potsdam) => potsdam.date), [data.length, 2])
+            const xs = tf.tensor2d((function() {
+                const shuffled = data.map((potsdam) => potsdam.date)
+                tf.util.shuffle(shuffled)
+ 
+                return shuffled
+            })(), [data.length, 1])
+
             const ys = tf.tensor2d(data.map((potsdam) => potsdam.Kp), [data.length, 1])
     
             console.log(xs.arraySync())
 
-            const xsnorm = xs.sub(min).div(max.sub(min))
+            const ysnorm = ys.sub(min).div(max.sub(min))
 
-            console.log(xsnorm.arraySync())
+            console.log(ysnorm.arraySync())
 
             console.log("begin model training")
 
-            this.model.fit(xsnorm, ys, {
+            this.model.fit(xs, ysnorm, {
                 epochs: this.epoch,
                 batchSize: this.batchSize,
                 callbacks: {

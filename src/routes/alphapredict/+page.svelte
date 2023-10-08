@@ -9,7 +9,7 @@
     const testPDate = alphaTimestampToPDate(dateToAlphaTimestamp(date))
 
     export const hourStep = 1000
-    export const sampleSize = 100
+    export const sampleSize = 1000
 
     var data: ChartData
     var resolved = false
