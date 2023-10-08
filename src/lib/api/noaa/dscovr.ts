@@ -1,4 +1,4 @@
-import { fetchJson } from "$lib/api/noaa/fetcher"
+import { fetchJson } from "$lib/api/fetcher"
 
 export interface DscovrDataStep {
     time_tag: string

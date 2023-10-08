@@ -7,6 +7,15 @@ export function getHourFromUTCDate(date: string): string {
     return hour;
 }
 
+export function getHourFromNOAADate(date: string): string {
+    let split = date.split(" ")
+
+    let day = split[0]
+    let hour = split[1]
+
+    return hour;
+}
+
 export function utcHourMinus(utcHour: string, minus: number): string {
     let split = utcHour.split(":")
 

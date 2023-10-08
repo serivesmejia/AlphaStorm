@@ -1,4 +1,9 @@
 import * as tf from "@tensorflow/tfjs"
+import { fetchPotsdamHistoricKP } from "$lib/api/potsdam/historic_kp"
+
+fetchPotsdamHistoricKP((data) => {
+    console.log(data[0])
+})
 
 export const model: tf.Sequential = tf.sequential()
 model.add(tf.layers.dense({units: 1, inputShape: [1]}))

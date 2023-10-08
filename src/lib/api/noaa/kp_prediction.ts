@@ -1,4 +1,4 @@
-import { fetchJson } from "./fetcher"
+import { fetchJson } from "../fetcher"
 
 export interface KpPrediction {
     model_prediction_time: string
