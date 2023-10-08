@@ -13,7 +13,7 @@
     fetchKpLatest3h((kpData: NOAAKpData[]) => {
         var sample: NOAAKpData[] = []
 
-        for(let i = 0 ; i < sampleSize ; i++) {
+        for(let i = 1 ; i < sampleSize ; i++) {
             sample.push(kpData[i])
         }
 

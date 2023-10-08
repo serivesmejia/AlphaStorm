@@ -7,7 +7,7 @@
 
 	let canvas: HTMLCanvasElement;
 
-	onMount(() => {	
+	onMount(() => {
 		new Chart(canvas, {
       		type: 'line',
       		data: data
@@ -15,4 +15,11 @@
 	})
 </script>
 
-<div style="width: ${width}px;"><canvas bind:this={canvas}></canvas></div>
+<style>
+	.graph {
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+<canvas class="graph" bind:this={canvas}/>

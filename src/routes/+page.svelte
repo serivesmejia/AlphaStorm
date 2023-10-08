@@ -1,5 +1,7 @@
 <script lang="ts">
-    import KPredictionPlot from "$lib/plot/helios/KPredictionPlot.svelte";
+    import KPlot from "$lib/plot/helios/KPlot.svelte";
+import KPredictionPlot from "$lib/plot/helios/KPredictionPlot.svelte";
+    import AlphaPredictPlot from "./alphapredict/AlphaPredictPlot.svelte";
     import G4 from "./popups/G4.svelte";
 
     var G1Visible = true
@@ -75,13 +77,13 @@
 .primer{
     height: 350px;
     width: 600px;
-    background-color: #02cf6f;
+    background-color: #fff;
 }
 
 .texto{
     height: 350px;
     width: 400px;
-    background-color: #521a00;
+    background-color: #fff;
     padding: 50px 50px;
 }
 </style>
@@ -107,6 +109,9 @@
         <div class="primer">
             <KPredictionPlot/>
         </div>
-        <div class="texto"></div>
+        <div class="texto">
+            <AlphaPredictPlot/>
+            <KPlot/>
+        </div>
     </menu>
 </body>
