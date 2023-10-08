@@ -1,6 +1,5 @@
 <script lang="ts">
-    import KPredictionPlot from "$lib/plot/helios/KPredictionPlot.svelte";
-    import G4 from "./popups/G4.svelte";
+    import G4 from "../popups/G4.svelte";
 
     var G1Visible = true
 
@@ -11,7 +10,7 @@
 </script>
 
 {#if G1Visible}
-<G4 funcionBotonOcultar={pepe}/>a
+<G4 funcionBotonOcultar={pepe}/>
 {/if}
 
 <style>
@@ -103,10 +102,10 @@
 </header>
  
 <body>
+    
+
     <menu class="cuerpo">
-        <div class="primer">
-            <KPredictionPlot/>
-        </div>
+        <div class="primer"></div>
         <div class="texto"></div>
     </menu>
 </body>
